@@ -27,6 +27,32 @@ Puzzle::Puzzle(std::array<std::array<int, 3>, 3> initial_puzzle, std::array<std:
     this->goal_puzzle = goal_puzzle;
 }
 
+bool Puzzle::is_Solvable()
+{
+    int inv_count = 0;
+    int inv_count_goal = 0;
+    std::vector<int> init, goal;
+
+    for (size_t i = 0; i < 3; i++)
+        for (size_t j = 0; j < 3; j++) {
+            if (this->initial_puzzle[i][j] != 0)
+                init.push_back(this->initial_puzzle[i][j]);
+            if (this->goal_puzzle[i][j] != 0)
+                goal.push_back(this->goal_puzzle[i][j]);
+        }
+
+    for (int i = 0; i < 7; i++)
+        for (int j = i + 1; j < 8; j++)
+            if (init[i] > init[j])
+                inv_count++;
+    for (int i = 0; i < 7; i++)
+        for (int j = i + 1; j < 8; j++)
+            if (goal[i] > goal[j])
+                inv_count_goal++;
+
+    return inv_count % 2 == inv_count_goal % 2;
+}
+
 int Puzzle::Calculate_Cost(std::shared_ptr<Node> input_node, int mode)
 {
     int cost = 0;
@@ -43,6 +69,10 @@ int Puzzle::Calculate_Cost(std::shared_ptr<Node> input_node, int mode)
 
 void Puzzle::Solve_Puzzle(int _max_depth)
 {
+    if (!this->is_Solvable()) {
+        std::cout << "This Puzzle is not solvable" << std::endl;
+        return;
+    }
     auto compare_lambda { [&](const std::shared_ptr<Node> first_node, const std::shared_ptr<Node> second_node) { return this->Calculate_Cost(first_node, 0) + first_node->level > this->Calculate_Cost(second_node, 0) + second_node->level; } };
     auto compare_lambda_reverse { [&](const std::shared_ptr<Node> first_node, const std::shared_ptr<Node> second_node) { return this->Calculate_Cost(first_node, 1) + first_node->level > this->Calculate_Cost(second_node, 1) + second_node->level; } };
     std::priority_queue<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>, decltype(compare_lambda)> Container_of_Nodes(compare_lambda);
@@ -62,16 +92,21 @@ void Puzzle::Solve_Puzzle(int _max_depth)
         Container_of_Nodes_reverse.pop();
 
         if (Calculate_Cost(low_cost_node, 0) == 0) {
+            std::cout << "1" << std::endl;
             this->Show_Solution(low_cost_node, 0);
             return;
         } else if (Calculate_Cost(low_cost_node_reverse, 1) == 0) {
+            std::cout << "2" << std::endl;
             this->Show_Solution(low_cost_node_reverse, 1);
             return;
         } else if (*low_cost_node == *low_cost_node_reverse) {
+            std::cout << "3" << std::endl;
             this->Show_Solution(low_cost_node, 0);
             this->Show_Solution(low_cost_node_reverse->parent_of_node, 1);
             return;
         } else if (low_cost_node->level >= _max_depth || low_cost_node_reverse->level >= _max_depth) {
+            std::cout << "4" << std::endl;
+            std::cout << "Search reached Max defined depth and found no answers -> Sorry" << std::endl;
             return;
         }
 
