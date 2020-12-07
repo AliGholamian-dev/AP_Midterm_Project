@@ -5,6 +5,7 @@
 #include <iostream>
 #include <memory>
 #include <queue>
+#include <set>
 #include <vector>
 
 class Puzzle {
@@ -28,6 +29,7 @@ private:
 
 public:
     Puzzle(std::array<std::array<int, 3>, 3> initial_puzzle, std::array<std::array<int, 3>, 3> goal_puzzle);
+    void Set_New_Matrixes(std::array<std::array<int, 3>, 3> initial_puzzle, std::array<std::array<int, 3>, 3> goal_puzzle);
     void Solve_Puzzle(int _max_depth);
 };
 
