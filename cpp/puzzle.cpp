@@ -1,6 +1,6 @@
 #include "puzzle.h"
 
-Puzzle::Node::Node(std::array<std::array<int, 3>, 3> mat, int level, std::shared_ptr<Node> parent)
+Puzzle::Node::Node(const std::array<std::array<int, 3>, 3>& mat, int level, const std::shared_ptr<Node>& parent)
 {
     this->level = level;
     this->mat = mat;
@@ -21,7 +21,7 @@ bool Puzzle::Node::operator==(const Node& second_node) const
     return true;
 }
 
-Puzzle::Puzzle(std::array<std::array<int, 3>, 3> initial_puzzle, std::array<std::array<int, 3>, 3> goal_puzzle)
+Puzzle::Puzzle(const std::array<std::array<int, 3>, 3>& initial_puzzle, const std::array<std::array<int, 3>, 3>& goal_puzzle)
 {
     this->initial_puzzle = initial_puzzle;
     this->goal_puzzle = goal_puzzle;
@@ -53,7 +53,7 @@ bool Puzzle::is_Solvable()
     return inv_count % 2 == inv_count_goal % 2;
 }
 
-int Puzzle::Calculate_Cost(std::shared_ptr<Node> input_node, int mode)
+int Puzzle::Calculate_Cost(const std::shared_ptr<Node>& input_node, int mode) const
 {
     int cost = 0;
     for (int i = 0; i < 3; i++)
@@ -67,7 +67,7 @@ int Puzzle::Calculate_Cost(std::shared_ptr<Node> input_node, int mode)
     return cost;
 }
 
-void Puzzle::Set_New_Matrixes(std::array<std::array<int, 3>, 3> initial_puzzle, std::array<std::array<int, 3>, 3> goal_puzzle)
+void Puzzle::Set_New_Matrixes(const std::array<std::array<int, 3>, 3>& initial_puzzle, const std::array<std::array<int, 3>, 3>& goal_puzzle)
 {
     this->initial_puzzle = initial_puzzle;
     this->goal_puzzle = goal_puzzle;
@@ -130,7 +130,7 @@ void Puzzle::Solve_Puzzle(int _max_depth)
     }
 }
 
-void Puzzle::Show_Solution(std::shared_ptr<Node> all_nodes, int mode) const
+void Puzzle::Show_Solution(const std::shared_ptr<Node>& all_nodes, int mode) const
 {
     if (all_nodes == nullptr)
         return;
