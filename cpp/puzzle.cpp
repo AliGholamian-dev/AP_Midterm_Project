@@ -67,6 +67,12 @@ int Puzzle::Calculate_Cost(std::shared_ptr<Node> input_node, int mode)
     return cost;
 }
 
+void Puzzle::Set_New_Matrixes(std::array<std::array<int, 3>, 3> initial_puzzle, std::array<std::array<int, 3>, 3> goal_puzzle)
+{
+    this->initial_puzzle = initial_puzzle;
+    this->goal_puzzle = goal_puzzle;
+}
+
 void Puzzle::Solve_Puzzle(int _max_depth)
 {
     if (!this->is_Solvable()) {
@@ -92,20 +98,16 @@ void Puzzle::Solve_Puzzle(int _max_depth)
         Container_of_Nodes_reverse.pop();
 
         if (Calculate_Cost(low_cost_node, 0) == 0) {
-            std::cout << "1" << std::endl;
             this->Show_Solution(low_cost_node, 0);
             return;
         } else if (Calculate_Cost(low_cost_node_reverse, 1) == 0) {
-            std::cout << "2" << std::endl;
             this->Show_Solution(low_cost_node_reverse, 1);
             return;
         } else if (*low_cost_node == *low_cost_node_reverse) {
-            std::cout << "3" << std::endl;
             this->Show_Solution(low_cost_node, 0);
             this->Show_Solution(low_cost_node_reverse->parent_of_node, 1);
             return;
         } else if (low_cost_node->level >= _max_depth || low_cost_node_reverse->level >= _max_depth) {
-            std::cout << "4" << std::endl;
             std::cout << "Search reached Max defined depth and found no answers -> Sorry" << std::endl;
             return;
         }
