@@ -1,6 +1,6 @@
 CXX = g++
 CXXFLAGS = -std=c++2a -Wall -I h -I /usr/local/include/gtest/ -O3 -c
-LXXFLAGS = -std=c++2a -Ih -pthread
+LXXFLAGS = -std=c++2a -Ih -pthread -ltbb
 OBJECTS = ./obj/puzzle.o ./obj/main.o
 GTEST = /usr/local/lib/libgtest.a
 TARGET = main
