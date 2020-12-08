@@ -79,8 +79,8 @@ void Puzzle::Solve_Puzzle(int _max_depth)
         std::cout << "This Puzzle is not solvable" << std::endl;
         return;
     }
-    auto compare_lambda { [&](const std::shared_ptr<Node> first_node, const std::shared_ptr<Node> second_node) { return this->Calculate_Cost(first_node, 0) + first_node->level > this->Calculate_Cost(second_node, 0) + second_node->level; } };
-    auto compare_lambda_reverse { [&](const std::shared_ptr<Node> first_node, const std::shared_ptr<Node> second_node) { return this->Calculate_Cost(first_node, 1) + first_node->level > this->Calculate_Cost(second_node, 1) + second_node->level; } };
+    auto compare_lambda { [&](const std::shared_ptr<Node> first_node, const std::shared_ptr<Node> second_node) { return (this->Calculate_Cost(first_node, 0) + first_node->level) > (this->Calculate_Cost(second_node, 0) + second_node->level); } };
+    auto compare_lambda_reverse { [&](const std::shared_ptr<Node> first_node, const std::shared_ptr<Node> second_node) { return (this->Calculate_Cost(first_node, 1) + first_node->level) > (this->Calculate_Cost(second_node, 1) + second_node->level); } };
     std::priority_queue<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>, decltype(compare_lambda)> Container_of_Nodes(compare_lambda);
     std::priority_queue<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>, decltype(compare_lambda_reverse)> Container_of_Nodes_reverse(compare_lambda_reverse);
 
@@ -90,7 +90,7 @@ void Puzzle::Solve_Puzzle(int _max_depth)
     Container_of_Nodes.push(root);
     Container_of_Nodes_reverse.push(goal_root);
 
-    while (!Container_of_Nodes.empty() || !Container_of_Nodes_reverse.empty()) {
+    while (!Container_of_Nodes.empty() && !Container_of_Nodes_reverse.empty()) {
         std::shared_ptr<Node> low_cost_node { Container_of_Nodes.top() };
         std::shared_ptr<Node> low_cost_node_reverse { Container_of_Nodes_reverse.top() };
 
