@@ -2,10 +2,12 @@
 #define PUZZLE_H
 
 #include <array>
+#include <chrono>
 #include <iostream>
 #include <memory>
 #include <queue>
 #include <set>
+#include <thread>
 #include <vector>
 
 class Puzzle {
@@ -25,12 +27,12 @@ private:
     std::array<std::array<int, 3>, 3> goal_puzzle;
     std::array<int, 4> row = { 1, 0, 0, -1 };
     std::array<int, 4> col = { 0, -1, 1, 0 };
-    void Show_Solution(const std::shared_ptr<Node>& all_nodes, int mode) const;
+    void Show_Solution(const std::shared_ptr<Node>& all_nodes, const int& mode, const int& text_color, const int& border_color, const int& time_interval, int step) const;
 
 public:
     Puzzle(const std::array<std::array<int, 3>, 3>& initial_puzzle, const std::array<std::array<int, 3>, 3>& goal_puzzle);
     void Set_New_Matrixes(const std::array<std::array<int, 3>, 3>& initial_puzzle, const std::array<std::array<int, 3>, 3>& goal_puzzle);
-    void Solve_Puzzle(int _max_depth);
+    void Solve_Puzzle(int _max_depth, int text_color, int border_color, int time_interval);
 };
 
 #endif

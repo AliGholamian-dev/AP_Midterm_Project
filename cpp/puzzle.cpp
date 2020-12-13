@@ -74,12 +74,14 @@ void Puzzle::Set_New_Matrixes(const std::array<std::array<int, 3>, 3>& initial_p
     this->goal_puzzle = goal_puzzle;
 }
 
-void Puzzle::Solve_Puzzle(int _max_depth)
+void Puzzle::Solve_Puzzle(int _max_depth, int text_color, int border_color, int time_interval)
 {
+    std::cout << "\u001b[H\u001b[2J";
     if (!this->is_Solvable()) {
         std::cout << "This Puzzle is not solvable" << std::endl;
         return;
     }
+    std::cout << "Solving..." << std::endl;
     auto comp { [&](const std::shared_ptr<Node> first_node, const std::shared_ptr<Node> second_node) { return (this->Calculate_Cost(first_node, 0) + first_node->level) > (this->Calculate_Cost(second_node, 0) + second_node->level); } };
     auto rcomp { [&](const std::shared_ptr<Node> first_node, const std::shared_ptr<Node> second_node) { return (this->Calculate_Cost(first_node, 1) + first_node->level) > (this->Calculate_Cost(second_node, 1) + second_node->level); } };
     std::priority_queue<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>, decltype(comp)> Nodes_pq(comp);
@@ -99,16 +101,20 @@ void Puzzle::Solve_Puzzle(int _max_depth)
         Nodes_rpq.pop();
 
         if (Calculate_Cost(prior_node, 0) == 0) {
-            this->Show_Solution(prior_node, 0);
+            std::cout << "\u001b[H\u001b[2J";
+            this->Show_Solution(prior_node, 0, text_color, border_color, time_interval, 1);
             return;
         } else if (Calculate_Cost(r_prior_node, 1) == 0) {
-            this->Show_Solution(r_prior_node, 1);
+            std::cout << "\u001b[H\u001b[2J";
+            this->Show_Solution(r_prior_node, 1, text_color, border_color, time_interval, 1);
             return;
         } else if (*prior_node == *r_prior_node) {
-            this->Show_Solution(prior_node, 0);
-            this->Show_Solution(r_prior_node->parent_of_node, 1);
+            std::cout << "\u001b[H\u001b[2J";
+            this->Show_Solution(prior_node, 0, text_color, border_color, time_interval, 1);
+            this->Show_Solution(r_prior_node->parent_of_node, 1, text_color, border_color, time_interval, 1);
             return;
         } else if (prior_node->level >= _max_depth || r_prior_node->level >= _max_depth) {
+            std::cout << "\u001b[H\u001b[2J";
             std::cout << "Search reached Max defined depth and found no answers -> Sorry" << std::endl;
             return;
         }
@@ -131,18 +137,24 @@ void Puzzle::Solve_Puzzle(int _max_depth)
     }
 }
 
-void Puzzle::Show_Solution(const std::shared_ptr<Node>& all_nodes, int mode) const
+void Puzzle::Show_Solution(const std::shared_ptr<Node>& all_nodes, const int& mode, const int& text_color, const int& border_color, const int& time_interval, int step) const
 {
     if (all_nodes == nullptr)
         return;
     if (mode == 0)
-        this->Show_Solution(all_nodes->parent_of_node, 0);
+        this->Show_Solution(all_nodes->parent_of_node, 0, text_color, border_color, time_interval, step + 1);
+    std::cout << std::endl
+              << "\u001b[" << 29 + text_color << ";1mStep. " << step << " :" << std::endl
+              << std::endl;
     for (size_t i = 0; i < 3; i++) {
-        for (size_t j = 0; j < 3; j++)
-            std::cout << all_nodes->mat[i][j] << "    ";
-        std::cout << std::endl;
+        for (size_t j = 0; j < 3; j++) {
+            std::cout << "  \u001b[" << 29 + border_color << ";1m|  "
+                      << "\u001b[" << 29 + text_color << ";1m" << all_nodes->mat[i][j];
+        }
+
+        std::cout << "  \u001b[" << 29 + border_color << ";1m|" << std::endl;
     }
-    std::cout << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(time_interval));
     if (mode == 1)
-        this->Show_Solution(all_nodes->parent_of_node, 1);
+        this->Show_Solution(all_nodes->parent_of_node, 1, text_color, border_color, time_interval, step + 1);
 }
