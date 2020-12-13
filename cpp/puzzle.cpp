@@ -24,6 +24,7 @@ bool Puzzle::Node::operator==(const Node& second_node) const
 
 Puzzle::Puzzle(const std::array<std::array<int, 3>, 3>& initial_puzzle, const std::array<std::array<int, 3>, 3>& goal_puzzle)
 {
+    this->step = 1;
     this->initial_puzzle = initial_puzzle;
     this->goal_puzzle = goal_puzzle;
 }
@@ -76,6 +77,7 @@ void Puzzle::Set_New_Matrixes(const std::array<std::array<int, 3>, 3>& initial_p
 
 void Puzzle::Solve_Puzzle(int _max_depth, int text_color, int border_color, int time_interval)
 {
+    this->step = 1;
     std::cout << "\u001b[H\u001b[2J";
     if (!this->is_Solvable()) {
         std::cout << "This Puzzle is not solvable" << std::endl;
@@ -102,16 +104,17 @@ void Puzzle::Solve_Puzzle(int _max_depth, int text_color, int border_color, int 
 
         if (Calculate_Cost(prior_node, 0) == 0) {
             std::cout << "\u001b[H\u001b[2J";
-            this->Show_Solution(prior_node, 0, text_color, border_color, time_interval, 1);
+            this->Show_Solution(prior_node, 0, text_color, border_color, time_interval);
             return;
         } else if (Calculate_Cost(r_prior_node, 1) == 0) {
             std::cout << "\u001b[H\u001b[2J";
-            this->Show_Solution(r_prior_node, 1, text_color, border_color, time_interval, 1);
+            this->Show_Solution(r_prior_node, 1, text_color, border_color, time_interval);
             return;
         } else if (*prior_node == *r_prior_node) {
             std::cout << "\u001b[H\u001b[2J";
-            this->Show_Solution(prior_node, 0, text_color, border_color, time_interval, 1);
-            this->Show_Solution(r_prior_node->parent_of_node, 1, text_color, border_color, time_interval, 1);
+            this->Show_Solution(prior_node, 0, text_color, border_color, time_interval);
+            std::cout << std::endl;
+            this->Show_Solution(r_prior_node->parent_of_node, 1, text_color, border_color, time_interval);
             return;
         } else if (prior_node->level >= _max_depth || r_prior_node->level >= _max_depth) {
             std::cout << "\u001b[H\u001b[2J";
@@ -137,24 +140,32 @@ void Puzzle::Solve_Puzzle(int _max_depth, int text_color, int border_color, int 
     }
 }
 
-void Puzzle::Show_Solution(const std::shared_ptr<Node>& all_nodes, const int& mode, const int& text_color, const int& border_color, const int& time_interval, int step) const
+void Puzzle::Show_Solution(const std::shared_ptr<Node>& all_nodes, const int& mode, const int& text_color, const int& border_color, const int& time_interval) const
 {
     if (all_nodes == nullptr)
         return;
     if (mode == 0)
-        this->Show_Solution(all_nodes->parent_of_node, 0, text_color, border_color, time_interval, step + 1);
+        this->Show_Solution(all_nodes->parent_of_node, 0, text_color, border_color, time_interval);
     std::cout << std::endl
               << "\u001b[" << 29 + text_color << ";1mStep. " << step << " :" << std::endl
               << std::endl;
+    this->step++;
     for (size_t i = 0; i < 3; i++) {
         for (size_t j = 0; j < 3; j++) {
-            std::cout << "  \u001b[" << 29 + border_color << ";1m|  "
+            if (all_nodes->mat[i][j] == 0) {
+                std::cout << "  \u001b[0m\u001b[" << 29 + border_color << ";1m|\u001b[s\u001b[1A-----\u001b[u\n\u001b[u\u001b[1B-----\u001b[u"
+                          << "\u001b[" << 39 + text_color << ";1m"
+                          << "\u001b[" << 29 + text_color << ";1m   ";
+                continue;
+            }
+            std::cout << "  \u001b[0m\u001b[" << 29 + border_color << ";1m|\u001b[s\u001b[1A-----\u001b[u\n\u001b[u\u001b[1B-----\u001b[u  "
                       << "\u001b[" << 29 + text_color << ";1m" << all_nodes->mat[i][j];
         }
 
-        std::cout << "  \u001b[" << 29 + border_color << ";1m|" << std::endl;
+        std::cout << "  \u001b[0m\u001b[" << 29 + border_color << ";1m|" << std::endl
+                  << std::endl;
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(time_interval));
     if (mode == 1)
-        this->Show_Solution(all_nodes->parent_of_node, 1, text_color, border_color, time_interval, step + 1);
+        this->Show_Solution(all_nodes->parent_of_node, 1, text_color, border_color, time_interval);
 }
