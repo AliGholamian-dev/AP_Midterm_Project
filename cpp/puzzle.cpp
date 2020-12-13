@@ -1,7 +1,8 @@
 #include "puzzle.h"
 
-Puzzle::Node::Node(const std::array<std::array<int, 3>, 3>& mat, int level, const std::shared_ptr<Node>& parent)
+Puzzle::Node::Node(const std::array<std::array<int, 3>, 3>& mat, int level, int came_from, const std::shared_ptr<Node>& parent)
 {
+    this->came_from = came_from;
     this->level = level;
     this->mat = mat;
     this->parent_of_node = parent;
@@ -79,52 +80,52 @@ void Puzzle::Solve_Puzzle(int _max_depth)
         std::cout << "This Puzzle is not solvable" << std::endl;
         return;
     }
-    auto compare_lambda { [&](const std::shared_ptr<Node> first_node, const std::shared_ptr<Node> second_node) { return (this->Calculate_Cost(first_node, 0) + first_node->level) > (this->Calculate_Cost(second_node, 0) + second_node->level); } };
-    auto compare_lambda_reverse { [&](const std::shared_ptr<Node> first_node, const std::shared_ptr<Node> second_node) { return (this->Calculate_Cost(first_node, 1) + first_node->level) > (this->Calculate_Cost(second_node, 1) + second_node->level); } };
-    std::priority_queue<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>, decltype(compare_lambda)> Container_of_Nodes(compare_lambda);
-    std::priority_queue<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>, decltype(compare_lambda_reverse)> Container_of_Nodes_reverse(compare_lambda_reverse);
+    auto comp { [&](const std::shared_ptr<Node> first_node, const std::shared_ptr<Node> second_node) { return (this->Calculate_Cost(first_node, 0) + first_node->level) > (this->Calculate_Cost(second_node, 0) + second_node->level); } };
+    auto rcomp { [&](const std::shared_ptr<Node> first_node, const std::shared_ptr<Node> second_node) { return (this->Calculate_Cost(first_node, 1) + first_node->level) > (this->Calculate_Cost(second_node, 1) + second_node->level); } };
+    std::priority_queue<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>, decltype(comp)> Nodes_pq(comp);
+    std::priority_queue<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>, decltype(rcomp)> Nodes_rpq(rcomp);
 
-    std::shared_ptr<Node> root { std::make_shared<Node>(this->initial_puzzle, 0, nullptr) };
-    std::shared_ptr<Node> goal_root { std::make_shared<Node>(this->goal_puzzle, 0, nullptr) };
+    std::shared_ptr<Node> root { std::make_shared<Node>(this->initial_puzzle, 0, 5, nullptr) };
+    std::shared_ptr<Node> goal_root { std::make_shared<Node>(this->goal_puzzle, 0, 5, nullptr) };
 
-    Container_of_Nodes.push(root);
-    Container_of_Nodes_reverse.push(goal_root);
+    Nodes_pq.push(root);
+    Nodes_rpq.push(goal_root);
 
-    while (!Container_of_Nodes.empty() && !Container_of_Nodes_reverse.empty()) {
-        std::shared_ptr<Node> low_cost_node { Container_of_Nodes.top() };
-        std::shared_ptr<Node> low_cost_node_reverse { Container_of_Nodes_reverse.top() };
+    while (!Nodes_pq.empty() && !Nodes_rpq.empty()) {
+        std::shared_ptr<Node> prior_node { Nodes_pq.top() };
+        std::shared_ptr<Node> r_prior_node { Nodes_rpq.top() };
 
-        Container_of_Nodes.pop();
-        Container_of_Nodes_reverse.pop();
+        Nodes_pq.pop();
+        Nodes_rpq.pop();
 
-        if (Calculate_Cost(low_cost_node, 0) == 0) {
-            this->Show_Solution(low_cost_node, 0);
+        if (Calculate_Cost(prior_node, 0) == 0) {
+            this->Show_Solution(prior_node, 0);
             return;
-        } else if (Calculate_Cost(low_cost_node_reverse, 1) == 0) {
-            this->Show_Solution(low_cost_node_reverse, 1);
+        } else if (Calculate_Cost(r_prior_node, 1) == 0) {
+            this->Show_Solution(r_prior_node, 1);
             return;
-        } else if (*low_cost_node == *low_cost_node_reverse) {
-            this->Show_Solution(low_cost_node, 0);
-            this->Show_Solution(low_cost_node_reverse->parent_of_node, 1);
+        } else if (*prior_node == *r_prior_node) {
+            this->Show_Solution(prior_node, 0);
+            this->Show_Solution(r_prior_node->parent_of_node, 1);
             return;
-        } else if (low_cost_node->level >= _max_depth || low_cost_node_reverse->level >= _max_depth) {
+        } else if (prior_node->level >= _max_depth || r_prior_node->level >= _max_depth) {
             std::cout << "Search reached Max defined depth and found no answers -> Sorry" << std::endl;
             return;
         }
 
         for (int i = 0; i < 4; i++) {
-            if (this->Check_Coordinates(low_cost_node->zero_x + this->row[i], low_cost_node->zero_y + this->col[i])) {
-                std::array<std::array<int, 3>, 3> temp { low_cost_node->mat };
-                std::swap(temp[low_cost_node->zero_y][low_cost_node->zero_x], temp[low_cost_node->zero_y + this->col[i]][low_cost_node->zero_x + this->row[i]]);
-                std::shared_ptr<Node> child { std::make_shared<Node>(temp, low_cost_node->level + 1, low_cost_node) };
-                Container_of_Nodes.push(child);
+            if (this->Check_Coordinates(prior_node->zero_x + this->row[i], prior_node->zero_y + this->col[i]) && prior_node->came_from != 3 - i) {
+                std::array<std::array<int, 3>, 3> temp { prior_node->mat };
+                std::swap(temp[prior_node->zero_y][prior_node->zero_x], temp[prior_node->zero_y + this->col[i]][prior_node->zero_x + this->row[i]]);
+                std::shared_ptr<Node> child { std::make_shared<Node>(temp, prior_node->level + 1, i, prior_node) };
+                Nodes_pq.push(child);
             }
 
-            if (this->Check_Coordinates(low_cost_node_reverse->zero_x + this->row[i], low_cost_node_reverse->zero_y + this->col[i])) {
-                std::array<std::array<int, 3>, 3> temp { low_cost_node_reverse->mat };
-                std::swap(temp[low_cost_node_reverse->zero_y][low_cost_node_reverse->zero_x], temp[low_cost_node_reverse->zero_y + this->col[i]][low_cost_node_reverse->zero_x + this->row[i]]);
-                std::shared_ptr<Node> child { std::make_shared<Node>(temp, low_cost_node_reverse->level + 1, low_cost_node_reverse) };
-                Container_of_Nodes_reverse.push(child);
+            if (this->Check_Coordinates(r_prior_node->zero_x + this->row[i], r_prior_node->zero_y + this->col[i]) && r_prior_node->came_from != 3 - i) {
+                std::array<std::array<int, 3>, 3> temp { r_prior_node->mat };
+                std::swap(temp[r_prior_node->zero_y][r_prior_node->zero_x], temp[r_prior_node->zero_y + this->col[i]][r_prior_node->zero_x + this->row[i]]);
+                std::shared_ptr<Node> child { std::make_shared<Node>(temp, r_prior_node->level + 1, i, r_prior_node) };
+                Nodes_rpq.push(child);
             }
         }
     }
