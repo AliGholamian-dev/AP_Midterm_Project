@@ -17,9 +17,9 @@ int main(int argc, char** argv)
     a.Solve_Puzzle(1000);
     std::cout << "New puzzle" << std::endl;
     std::array<std::array<int, 3>, 3> in2 = {
-        std::array<int, 3> { 1, 2, 3 },
-        std::array<int, 3> { 4, 5, 6 },
-        std::array<int, 3> { 7, 0, 8 }
+        std::array<int, 3> { 1, 7, 6 },
+        std::array<int, 3> { 4, 5, 0 },
+        std::array<int, 3> { 3, 2, 8 }
     };
     std::array<std::array<int, 3>, 3> fi2 = {
         std::array<int, 3> { 1, 2, 3 },
