@@ -81,7 +81,7 @@ void Puzzle::Solve_Puzzle(const std::array<int, 4>& settings)
     int text_color { settings[0] }, border_color { settings[1] }, _max_depth { settings[2] }, time_interval { settings[3] };
     this->step = 1;
 
-    std::cout << "\u001b[H\u001b[2J";
+    std::cout << "\n\u001b[s\u001b[u\u001b[H\u001b[2J";
     if (!this->is_Solvable()) {
         std::cout << "This Puzzle is not solvable" << std::endl;
         return;
