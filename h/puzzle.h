@@ -1,6 +1,7 @@
 #ifndef PUZZLE_H
 #define PUZZLE_H
 
+#include <algorithm>
 #include <array>
 #include <chrono>
 #include <iostream>

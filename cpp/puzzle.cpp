@@ -57,7 +57,7 @@ bool Puzzle::is_Solvable()
 
 int Puzzle::Calculate_Cost(const std::shared_ptr<Node>& input_node, int mode) const
 {
-    int cost = 0;
+    int cost { 0 };
     for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++)
             if (input_node->mat[i][j] != 0) {
@@ -168,6 +168,7 @@ void Puzzle::Show_Solution(const std::shared_ptr<Node>& all_nodes, const int& mo
         std::cout << "  \u001b[0m\u001b[" << 29 + border_color << ";1m|" << std::endl
                   << std::endl;
     }
+
     std::this_thread::sleep_for(std::chrono::milliseconds(time_interval));
     if (mode == 1)
         this->Show_Solution(all_nodes->parent_of_node, 1, text_color, border_color, time_interval);
