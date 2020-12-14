@@ -31,8 +31,8 @@ Puzzle::Puzzle(const std::array<std::array<int, 3>, 3>& initial_puzzle, const st
 
 bool Puzzle::is_Solvable()
 {
-    int inv_count = 0;
-    int inv_count_goal = 0;
+    int inv_count { 0 };
+    int inv_count_goal { 0 };
     std::vector<int> init, goal;
 
     for (size_t i = 0; i < 3; i++)
@@ -75,9 +75,12 @@ void Puzzle::Set_New_Matrixes(const std::array<std::array<int, 3>, 3>& initial_p
     this->goal_puzzle = goal_puzzle;
 }
 
-void Puzzle::Solve_Puzzle(int _max_depth, int text_color, int border_color, int time_interval)
+void Puzzle::Solve_Puzzle(const std::array<int, 4>& settings)
 {
+
+    int text_color { settings[0] }, border_color { settings[1] }, _max_depth { settings[2] }, time_interval { settings[3] };
     this->step = 1;
+
     std::cout << "\u001b[H\u001b[2J";
     if (!this->is_Solvable()) {
         std::cout << "This Puzzle is not solvable" << std::endl;
