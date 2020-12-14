@@ -17,6 +17,5 @@ int main(int argc, char** argv)
     UI_Settings(initial, goal, settings);
     Puzzle New_Puzzle { initial, goal };
     New_Puzzle.Solve_Puzzle(settings);
-    std::cout << "\u001b[0m";
     return 0;
 }

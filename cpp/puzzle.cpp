@@ -83,7 +83,7 @@ void Puzzle::Solve_Puzzle(const std::array<int, 4>& settings)
 
     std::cout << "\n\u001b[s\u001b[u\u001b[H\u001b[2J";
     if (!this->is_Solvable()) {
-        std::cout << "This Puzzle is not solvable" << std::endl;
+        std::cout << "This Puzzle is not solvable\u001b[0m" << std::endl;
         return;
     }
     std::cout << "Solving..." << std::endl;
@@ -108,20 +108,28 @@ void Puzzle::Solve_Puzzle(const std::array<int, 4>& settings)
         if (Calculate_Cost(prior_node, 0) == 0) {
             std::cout << "\u001b[H\u001b[2J";
             this->Show_Solution(prior_node, 0, text_color, border_color, time_interval);
+            std::cout << "\u001b[0m";
             return;
         } else if (Calculate_Cost(r_prior_node, 1) == 0) {
             std::cout << "\u001b[H\u001b[2J";
             this->Show_Solution(r_prior_node, 1, text_color, border_color, time_interval);
+            std::cout << "\u001b[0m";
             return;
         } else if (*prior_node == *r_prior_node) {
+            while (*(prior_node->parent_of_node) == *(r_prior_node->parent_of_node)) {
+                r_prior_node = r_prior_node->parent_of_node;
+                prior_node = prior_node->parent_of_node;
+            }
+
             std::cout << "\u001b[H\u001b[2J";
             this->Show_Solution(prior_node, 0, text_color, border_color, time_interval);
             std::cout << std::endl;
             this->Show_Solution(r_prior_node->parent_of_node, 1, text_color, border_color, time_interval);
+            std::cout << "\u001b[0m";
             return;
         } else if (prior_node->level >= _max_depth || r_prior_node->level >= _max_depth) {
             std::cout << "\u001b[H\u001b[2J";
-            std::cout << "Search reached Max defined depth and found no answers -> Sorry" << std::endl;
+            std::cout << "Search reached Max defined depth and found no answers -> Sorry\u001b[0m" << std::endl;
             return;
         }
 
