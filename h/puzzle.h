@@ -1,9 +1,8 @@
 #ifndef PUZZLE_H
 #define PUZZLE_H
 
-#include <array>
+#include "UI.h"
 #include <chrono>
-#include <iostream>
 #include <memory>
 #include <queue>
 #include <set>
@@ -20,7 +19,7 @@ private:
         std::array<std::array<int, 3>, 3> mat;
         int zero_x, zero_y, level, came_from;
     };
-    bool is_Solvable();
+    friend bool is_Solvable(const std::array<std::array<int, 3>, 3>& initial, const std::array<std::array<int, 3>, 3>& goal);
     bool Check_Coordinates(int x, int y) { return (x >= 0 && x < 3 && y >= 0 && y < 3); };
     int Calculate_Cost(const std::shared_ptr<Node>& input_node, int mode) const;
     mutable int step { 1 };

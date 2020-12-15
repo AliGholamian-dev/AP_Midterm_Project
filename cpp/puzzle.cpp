@@ -29,32 +29,6 @@ Puzzle::Puzzle(const std::array<std::array<int, 3>, 3>& initial_puzzle, const st
     this->goal_puzzle = goal_puzzle;
 }
 
-bool Puzzle::is_Solvable()
-{
-    int inv_count { 0 };
-    int inv_count_goal { 0 };
-    std::vector<int> init, goal;
-
-    for (size_t i = 0; i < 3; i++)
-        for (size_t j = 0; j < 3; j++) {
-            if (this->initial_puzzle[i][j] != 0)
-                init.push_back(this->initial_puzzle[i][j]);
-            if (this->goal_puzzle[i][j] != 0)
-                goal.push_back(this->goal_puzzle[i][j]);
-        }
-
-    for (int i = 0; i < 7; i++)
-        for (int j = i + 1; j < 8; j++)
-            if (init[i] > init[j])
-                inv_count++;
-    for (int i = 0; i < 7; i++)
-        for (int j = i + 1; j < 8; j++)
-            if (goal[i] > goal[j])
-                inv_count_goal++;
-
-    return inv_count % 2 == inv_count_goal % 2;
-}
-
 int Puzzle::Calculate_Cost(const std::shared_ptr<Node>& input_node, int mode) const
 {
     int cost { 0 };
@@ -82,7 +56,7 @@ void Puzzle::Solve_Puzzle(const std::array<int, 4>& settings)
     this->step = 1;
 
     std::cout << "\n\u001b[s\u001b[u\u001b[H\u001b[2J";
-    if (!this->is_Solvable()) {
+    if (!is_Solvable(this->initial_puzzle, this->goal_puzzle)) {
         std::cout << "This Puzzle is not solvable\u001b[0m" << std::endl;
         return;
     }
