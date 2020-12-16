@@ -1,6 +1,24 @@
 #include "UI.h"
 
-bool is_Solvable(const std::array<std::array<int, 3>, 3>& initial_puzzle, const std::array<std::array<int, 3>, 3>& goal_puzzle)
+bool ReRun(int text_color)
+{
+    char ReRun_State = 'Y';
+    std::cout << "\n\u001b[" << 29 + text_color << ";1m" << std::endl;
+    std::cout << "Do you want to ReRun the Program? -> \u001b[32;1mY(yes)"
+              << "\u001b[" << 29 + text_color << ";1m"
+              << " / \u001b[31;1mN(No): "
+              << "\u001b[" << 29 + text_color << ";1m\u001b[s";
+    do {
+        std::cout << "\u001b[u\u001b[0K";
+        std::cin >> ReRun_State;
+    } while (ReRun_State != 'y' && ReRun_State != 'Y' && ReRun_State != 'n' && ReRun_State != 'N');
+    std::cout << "\u001b[H\u001b[3J\u001b[2J\u001b[0m";
+    return (ReRun_State == 'y' || ReRun_State == 'Y');
+}
+
+bool is_Solvable(
+    const std::array<std::array<int, 3>, 3>& initial_puzzle,
+    const std::array<std::array<int, 3>, 3>& goal_puzzle)
 {
     int inv_count { 0 };
     int inv_count_goal { 0 };
@@ -26,14 +44,16 @@ bool is_Solvable(const std::array<std::array<int, 3>, 3>& initial_puzzle, const 
     return inv_count % 2 == inv_count_goal % 2;
 }
 
-void UI_Settings(std::array<std::array<int, 3>, 3>& initial, std::array<std::array<int, 3>, 3>& goal, std::array<int, 4>& settings)
+void UI_Settings(
+    std::array<std::array<int, 3>, 3>& initial,
+    std::array<std::array<int, 3>, 3>& goal,
+    std::array<int, 4>& settings)
 {
     char special_puzzle;
     std::string name {};
-
     std::cout
         << std::endl
-        << "Hi, Welcome to the 8-Puzzle Solver" << std::endl;
+        << "\u001b[H\u001b[2J\u001b[0mHi, Welcome to the 8-Puzzle Solver" << std::endl;
     std::cout << "What's Your Name: ";
     std::cin >> name;
     std::cout << std::endl
@@ -61,18 +81,23 @@ void UI_Settings(std::array<std::array<int, 3>, 3>& initial, std::array<std::arr
 
     std::cout << "\u001b[" << 29 + settings[0] << ";1m" << std::endl;
     std::cout << "\u001b[H\u001b[2J";
-    std::cout << "Do you have  a special Goal Puzzle in mind? -> \u001b[32;1mY(yes)"
+    std::cout << "Do you have  a special *** Goal *** Puzzle in mind? -> \u001b[32;1mY(yes)"
               << "\u001b[" << 29 + settings[0] << ";1m"
               << " / \u001b[31;1mN(No): "
-              << "\u001b[" << 29 + settings[0] << ";1m";
-    std::cin >> special_puzzle;
+              << "\u001b[" << 29 + settings[0] << ";1m\u001b[s";
+    do {
+        std::cout << "\u001b[u\u001b[0K";
+        std::cin >> special_puzzle;
+    } while (special_puzzle != 'y' && special_puzzle != 'Y' && special_puzzle != 'n' && special_puzzle != 'N');
+
     if (special_puzzle == 'Y' || special_puzzle == 'y') {
         std::cout << "\u001b[" << 29 + settings[0] << ";1m"
                   << "Nice, Enter your puzzle bellow: (Left to Right -> Top to Bottom)" << std::endl
                   << std::endl;
         for (size_t i = 0; i < 3; i++) {
             for (size_t j = 0; j < 3; j++) {
-                std::cout << "  \u001b[" << 29 + settings[1] << ";1m|\u001b[s\u001b[1B-----\u001b[u\u001b[1A-----\u001b[u  "
+                std::cout << "  \u001b[" << 29 + settings[1]
+                          << ";1m|\u001b[s\u001b[1B-----\u001b[u\u001b[1A-----\u001b[u  "
                           << "\u001b[" << 29 + settings[0] << ";1m";
                 std::cout << "\u001b[s";
                 do {
@@ -92,7 +117,8 @@ void UI_Settings(std::array<std::array<int, 3>, 3>& initial, std::array<std::arr
                   << std::endl;
         for (size_t i = 0; i < 3; i++) {
             for (size_t j = 0; j < 3; j++) {
-                std::cout << "  \u001b[" << 29 + settings[1] << ";1m|\u001b[s\u001b[1A-----\u001b[u\n\u001b[u\u001b[1B-----\u001b[u  "
+                std::cout << "  \u001b[" << 29 + settings[1]
+                          << ";1m|\u001b[s\u001b[1A-----\u001b[u\n\u001b[u\u001b[1B-----\u001b[u  "
                           << "\u001b[" << 29 + settings[0] << ";1m" << goal[i][j];
             }
             std::cout << "  \u001b[" << 29 + settings[1] << ";1m|" << std::endl
@@ -106,18 +132,24 @@ void UI_Settings(std::array<std::array<int, 3>, 3>& initial, std::array<std::arr
 
     std::cout << "\u001b[" << 29 + settings[0] << ";1m" << std::endl;
     std::cout << "\u001b[H\u001b[2J";
-    std::cout << "Do you have  a special Initial Puzzle in mind? -> \u001b[32;1mY(yes)"
+    std::cout << "Do you have  a special *** Initial *** Puzzle in mind? -> \u001b[32;1mY(yes)"
               << "\u001b[" << 29 + settings[0] << ";1m"
               << " / \u001b[31;1mN(No): "
-              << "\u001b[" << 29 + settings[0] << ";1m";
-    std::cin >> special_puzzle;
+              << "\u001b[" << 29 + settings[0] << ";1m\u001b[s";
+
+    do {
+        std::cout << "\u001b[u\u001b[0K";
+        std::cin >> special_puzzle;
+    } while (special_puzzle != 'y' && special_puzzle != 'Y' && special_puzzle != 'n' && special_puzzle != 'N');
+
     if (special_puzzle == 'Y' || special_puzzle == 'y') {
         std::cout << "\u001b[" << 29 + settings[0] << ";1m"
                   << "Nice, Enter your puzzle bellow: (Left to Right -> Top to Bottom)" << std::endl
                   << std::endl;
         for (size_t i = 0; i < 3; i++) {
             for (size_t j = 0; j < 3; j++) {
-                std::cout << "  \u001b[" << 29 + settings[1] << ";1m|\u001b[s\u001b[1B-----\u001b[u\u001b[1A-----\u001b[u  "
+                std::cout << "  \u001b[" << 29 + settings[1]
+                          << ";1m|\u001b[s\u001b[1B-----\u001b[u\u001b[1A-----\u001b[u  "
                           << "\u001b[" << 29 + settings[0] << ";1m";
                 std::cout << "\u001b[s";
                 do {
@@ -138,8 +170,9 @@ void UI_Settings(std::array<std::array<int, 3>, 3>& initial, std::array<std::arr
         std::default_random_engine generator(std::random_device {}());
         std::uniform_int_distribution<int> dist { 0, 8 };
         std::array<int, 9> random_array { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+        auto lambda { [&dist, &generator](int i) { return dist(generator); } };
         do {
-            std::random_shuffle(random_array.begin(), random_array.end(), [&dist, &generator](int i) { return dist(generator); });
+            std::random_shuffle(random_array.begin(), random_array.end(), lambda);
             for (size_t i = 0; i < 3; i++)
                 for (size_t j = 0; j < 3; j++)
                     initial[i][j] = random_array[i * 3 + j];
@@ -147,7 +180,8 @@ void UI_Settings(std::array<std::array<int, 3>, 3>& initial, std::array<std::arr
 
         for (size_t i = 0; i < 3; i++) {
             for (size_t j = 0; j < 3; j++) {
-                std::cout << "  \u001b[" << 29 + settings[1] << ";1m|\u001b[s\u001b[1A-----\u001b[u\n\u001b[u\u001b[1B-----\u001b[u  "
+                std::cout << "  \u001b[" << 29 + settings[1]
+                          << ";1m|\u001b[s\u001b[1A-----\u001b[u\n\u001b[u\u001b[1B-----\u001b[u  "
                           << "\u001b[" << 29 + settings[0] << ";1m" << initial[i][j];
             }
             std::cout << "  \u001b[" << 29 + settings[1] << ";1m|" << std::endl
