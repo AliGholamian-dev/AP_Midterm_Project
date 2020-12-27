@@ -1,5 +1,12 @@
 #include "puzzle.h"
 
+/**
+ * Node Constructor
+ * @param  {std::array<std::array<int, 3>, 3>}  mat : Puzzle state
+ * @param  {int} level                              : Depth of tree
+ * @param  {int} came_from                          : Pervious move (avoid returnig to last state)
+ * @param  {std::shared_ptr<Node>} parent           : Parent of current node
+ */
 Puzzle::Node::Node(
     const std::array<std::array<int, 3>, 3>& mat,
     int level,
@@ -10,6 +17,7 @@ Puzzle::Node::Node(
     this->level = level;
     this->mat = mat;
     this->parent_of_node = parent;
+    // Find coordinates of empty square
     for (size_t i = 0; i < 3; i++)
         for (size_t j = 0; j < 3; j++)
             if (this->mat[i][j] == 0) {
@@ -17,6 +25,12 @@ Puzzle::Node::Node(
                 this->zero_x = j;
             }
 }
+
+/**
+ * Checks if two states are the same
+ * @param  {Node} second_node : Second puzzle to compare to
+ * @return {bool}             : Two states are the same or not
+ */
 bool Puzzle::Node::operator==(const Node& second_node) const
 {
     for (size_t i = 0; i < 3; i++)
@@ -26,6 +40,11 @@ bool Puzzle::Node::operator==(const Node& second_node) const
     return true;
 }
 
+/**
+ * Puzzle Constructor 
+ * @param  {std::array<std::array<int, 3>, 3>}  initial_puzzle  : Init puzzle state 
+ * @param  {std::array<std::array<int, 3>, 3>}  goal_puzzle     : Goal puzzle state
+ */
 Puzzle::Puzzle(
     const std::array<std::array<int, 3>, 3>& initial_puzzle,
     const std::array<std::array<int, 3>, 3>& goal_puzzle)
@@ -35,20 +54,33 @@ Puzzle::Puzzle(
     this->goal_puzzle = goal_puzzle;
 }
 
+/**
+ * Calculate number of puzzle's disorder for ( A* ) algorithm
+ * @param  {Node_ptr} input_node : State to calculate it's cost
+ * @param  {int} mode            : Compare to init or goal puzzle ( for Bidirectional) 
+ * @return {int}                 : Number of puzzle's disorder
+ */
 int Puzzle::Calculate_Cost(const Node_ptr& input_node, int mode) const
 {
     int cost { 0 };
     for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++)
             if (input_node->mat[i][j] != 0) {
+                // Compare to goal state
                 if (mode == 0 && input_node->mat[i][j] != this->goal_puzzle[i][j])
-                    cost++;
+                    cost++; // increase cost if two squares are not equal
+                // Compare to init state
                 else if (mode == 1 && input_node->mat[i][j] != this->initial_puzzle[i][j])
-                    cost++;
+                    cost++; // increase cost if two squares are not equal
             }
     return cost;
 }
 
+/**
+ * Change init and goal state of puzzle
+ * @param  {std::array<std::array<int, 3>, 3>} initial_puzzle   : Init puzzle state 
+ * @param  {std::array<std::array<int, 3>, 3>} goal_puzzle      : Goal puzzle state
+ */
 void Puzzle::Set_New_Matrixes(
     const std::array<std::array<int, 3>, 3>& initial_puzzle,
     const std::array<std::array<int, 3>, 3>& goal_puzzle)
@@ -57,95 +89,147 @@ void Puzzle::Set_New_Matrixes(
     this->goal_puzzle = goal_puzzle;
 }
 
+/**
+ * Solves the puzzle
+ * @param  {std::array<int, 4>} settings : Users prefrences 
+ */
 void Puzzle::Solve_Puzzle(const std::array<int, 4>& settings)
 {
-
+    // Parse user settings
     int text_color { settings[0] }, border_color { settings[1] }, _max_depth { settings[2] }, time_interval { settings[3] };
     this->step = 1;
 
-    std::cout << "\n\u001b[s\u001b[u\u001b[H\u001b[2J";
+    // Clear terminal
+    std::cout << "\n\u001b[s\u001b[u\u001b[H\u001b[3J\u001b[2J";
+    // Warn user if puzzle is not solvable
     if (!is_Solvable(this->initial_puzzle, this->goal_puzzle)) {
         std::cout << "This Puzzle is not solvable" << std::endl;
         return;
     }
+    // Warn user that program is solving puzzle
     std::cout << "Solving..." << std::endl;
+    // Lambda function for comaparing two node's cost (Used in priority_queue)
+    // Sorts nodes based on cost for ( A* ) algorithm
+    // Cost = puzzle's disorder + level(depth)
     auto comp {
         [&](const Node_ptr& n1, const Node_ptr& n2) {
             return (this->Calculate_Cost(n1, 0) + n1->level) > (this->Calculate_Cost(n2, 0) + n2->level);
         }
     };
+    // Same as above but for reverse traversing of tree (Bidirectional)
     auto rcomp {
         [&](const Node_ptr& n1, const Node_ptr& n2) {
             return (this->Calculate_Cost(n1, 1) + n1->level) > (this->Calculate_Cost(n2, 1) + n2->level);
         }
     };
+    // priority_queue -> Container of nodes based on (lowers)cost for ( A* ) algorithm
+    // Faster than std::vector + std::sort -> Tested
     std::priority_queue<Node_ptr, std::vector<Node_ptr>, decltype(comp)> Nodes_pq(comp);
     std::priority_queue<Node_ptr, std::vector<Node_ptr>, decltype(rcomp)> Nodes_rpq(rcomp);
 
+    // Root of Tree (init state)
     Node_ptr root { std::make_shared<Node>(this->initial_puzzle, 0, 5, nullptr) };
+    // Root of Tree (goal state)(Bidirectional)
     Node_ptr goal_root { std::make_shared<Node>(this->goal_puzzle, 0, 5, nullptr) };
 
+    // Push Nodes to priority_queue
     Nodes_pq.push(root);
     Nodes_rpq.push(goal_root);
 
     while (!Nodes_pq.empty() && !Nodes_rpq.empty()) {
+        // Extract the node with lowest cost for checking
         Node_ptr prior_node { Nodes_pq.top() };
         Node_ptr r_prior_node { Nodes_rpq.top() };
-
+        // Remove extracted node from container
         Nodes_pq.pop();
         Nodes_rpq.pop();
-
+        // Bidirectional algorithm
+        // First possible result -> init state reaches goal first
         if (Calculate_Cost(prior_node, 0) == 0) {
-            std::cout << "\u001b[H\u001b[2J";
+            std::cout << "\u001b[H\u001b[3J\u001b[2J";
+            // Show result
             this->Show_Solution(prior_node, 0, text_color, border_color, time_interval);
             return;
-        } else if (Calculate_Cost(r_prior_node, 1) == 0) {
-            std::cout << "\u001b[H\u001b[2J";
+        }
+        // Second possible result -> goal state reaches init first
+        else if (Calculate_Cost(r_prior_node, 1) == 0) {
+            std::cout << "\u001b[H\u001b[3J\u001b[2J";
+            // Show result
             this->Show_Solution(r_prior_node, 1, text_color, border_color, time_interval);
             return;
-        } else if (*prior_node == *r_prior_node) {
+        }
+        // This is where Bidirectional search comes to benefit really
+        /*
+         Third possible result -> inint state and goal state intersect
+         in the middle of their searches
+         */
+        else if (*prior_node == *r_prior_node) {
+            /*
+             Important -> remove redundant moves
+             when two searches intersect from the point of intersection
+             to a specific piont second search just rolls back first searche's moves
+            */
             while (*(prior_node->parent_of_node) == *(r_prior_node->parent_of_node)) {
                 r_prior_node = r_prior_node->parent_of_node;
                 prior_node = prior_node->parent_of_node;
             }
-
-            std::cout << "\u001b[H\u001b[2J";
+            std::cout << "\u001b[H\u001b[3J\u001b[2J";
+            // Show result -> inti to middle
             this->Show_Solution(prior_node, 0, text_color, border_color, time_interval);
             std::cout << std::endl;
+            // Show result -> middle to goal
             this->Show_Solution(r_prior_node->parent_of_node, 1, text_color, border_color, time_interval);
             return;
-        } else if (prior_node->level >= _max_depth || r_prior_node->level >= _max_depth) {
-            std::cout << "\u001b[H\u001b[2J";
+        }
+        // Fourth possible result -> No answer and we reached max depth search
+        else if (prior_node->level >= _max_depth || r_prior_node->level >= _max_depth) {
+            std::cout << "\u001b[H\u001b[3J\u001b[2J";
             std::cout << "Search reached Max defined depth and found no answers -> Sorry" << std::endl;
             return;
         }
 
+        // Generate every valid neighbor of empty square
         for (int i = 0; i < 4; i++) {
+            // Ckeck if next move is valid -> Forward search
             if (
                 this->Check_Coordinates(prior_node->zero_x + this->row[i], prior_node->zero_y + this->col[i])
                 && prior_node->came_from != 3 - i) {
                 std::array<std::array<int, 3>, 3> temp { prior_node->mat };
+                // Swap empty square with it's neighbor
                 std::swap(
                     temp[prior_node->zero_y][prior_node->zero_x],
                     temp[prior_node->zero_y + this->col[i]][prior_node->zero_x + this->row[i]]);
+                // Generate new state of puzzle
                 Node_ptr child { std::make_shared<Node>(temp, prior_node->level + 1, i, prior_node) };
+                // Push new state of puzzle to priority_queue
                 Nodes_pq.push(child);
             }
-
+            // Ckeck if next move is valid -> Reverse search
             if (
                 this->Check_Coordinates(r_prior_node->zero_x + this->row[i], r_prior_node->zero_y + this->col[i])
                 && r_prior_node->came_from != 3 - i) {
                 std::array<std::array<int, 3>, 3> temp { r_prior_node->mat };
+                // Swap empty square with it's neighbor
                 std::swap(
                     temp[r_prior_node->zero_y][r_prior_node->zero_x],
                     temp[r_prior_node->zero_y + this->col[i]][r_prior_node->zero_x + this->row[i]]);
+                // Generate new state of puzzle
                 Node_ptr child { std::make_shared<Node>(temp, r_prior_node->level + 1, i, r_prior_node) };
+                // Push new state of puzzle to priority_queue
                 Nodes_rpq.push(child);
             }
         }
     }
 }
 
+/**
+ * Show Solution in a beautiful maner
+ * @param  {Node_ptr} all_nodes : The sate of puzzle to start  from  
+ * @param  {int} mode           : start from init or goal puzzle ( for Bidirectional) 
+ * @param  {int} text_color     : Color of text
+ * @param  {int} border_color   : Color of puzzle border
+ * @param  {int} time_interval  : Delay time between showing each state of answer
+ */
 void Puzzle::Show_Solution(
     const Node_ptr& all_nodes,
     const int& mode,
@@ -153,14 +237,18 @@ void Puzzle::Show_Solution(
     const int& border_color,
     const int& time_interval) const
 {
+    // Return in case reaching end
     if (all_nodes == nullptr)
         return;
+    // Go deep down till we reach init node
     if (mode == 0)
         this->Show_Solution(all_nodes->parent_of_node, 0, text_color, border_color, time_interval);
+    // Show puzzle in a beautiful maner
     std::cout << std::endl
               << "\u001b[" << 29 + text_color << ";1mStep. \u001b[32;1m" << step
               << " \u001b[31;1m:" << std::endl
               << std::endl;
+    // Increase step of answer
     this->step++;
     for (size_t i = 0; i < 3; i++) {
         for (size_t j = 0; j < 3; j++) {
@@ -180,8 +268,12 @@ void Puzzle::Show_Solution(
                   << std::endl;
     }
     std::cout << "  \u001b[0m\u001b[1m---------------------" << std::endl;
-
+    // Return in case reaching end
+    if (all_nodes->parent_of_node == nullptr)
+        return;
+    // Delay between showing each step
     std::this_thread::sleep_for(std::chrono::milliseconds(time_interval));
+    // Go deep down till we reach goal node
     if (mode == 1)
         this->Show_Solution(all_nodes->parent_of_node, 1, text_color, border_color, time_interval);
 }
