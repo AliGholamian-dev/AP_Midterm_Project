@@ -39,7 +39,7 @@ bool is_Solvable(
     int inv_count_goal { 0 };
     std::vector<int> init, goal;
 
-    // Calculate the number of inversions in initial puzzle
+    // Pushing puzzles in 1D vectors
     for (size_t i = 0; i < 3; i++)
         for (size_t j = 0; j < 3; j++) {
             if (initial_puzzle[i][j] != 0)
@@ -48,11 +48,12 @@ bool is_Solvable(
                 goal.push_back(goal_puzzle[i][j]);
         }
 
-    // Calculate the number of inversions in goal puzzle
+    // Calculate the number of inversions in initial puzzle
     for (int i = 0; i < 7; i++)
         for (int j = i + 1; j < 8; j++)
             if (init[i] > init[j])
                 inv_count++;
+    // Calculate the number of inversions in goal puzzle
     for (int i = 0; i < 7; i++)
         for (int j = i + 1; j < 8; j++)
             if (goal[i] > goal[j])
