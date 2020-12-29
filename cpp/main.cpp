@@ -4,7 +4,7 @@
 int main(int argc, char** argv)
 {
     // generate default puzzles
-    std::array<int, 4> settings { 1, 1, 1000, 100 };
+    std::array<int, 5> settings { 1, 1, 1000, 100, 0 };
     std::array<std::array<int, 3>, 3> initial {
         std::array<int, 3> { 1, 2, 3 },
         std::array<int, 3> { 4, 5, 6 },

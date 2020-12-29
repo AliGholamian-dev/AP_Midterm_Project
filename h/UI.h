@@ -27,11 +27,11 @@ bool is_Solvable(
  * Sets init and goal puzzle and UI Colors based on users preferences
  * @param  {std::array<std::array<int, 3>, 3>&} initial  : Initial state of Puzzle
  * @param  {std::array<std::array<int, 3>, 3>&} goal     : Goal state of Puzzle
- * @param  {std::array<int, 4>&}                settings : User settings
+ * @param  {std::array<int, 5>&}                settings : User settings
  */
 void UI_Settings(
     std::array<std::array<int, 3>, 3>& initial,
     std::array<std::array<int, 3>, 3>& goal,
-    std::array<int, 4>& settings);
+    std::array<int, 5>& settings);
 
 #endif

@@ -2,7 +2,9 @@
 #define PUZZLE_H
 
 #include "UI.h"
+#include <algorithm>
 #include <chrono>
+#include <execution>
 #include <memory>
 #include <queue>
 #include <thread>
@@ -17,13 +19,13 @@ private:
          * Node Constructor
          * @param  {std::array<std::array<int, 3>, 3>}  mat : Puzzle state
          * @param  {int} level                              : Depth of tree
-         * @param  {int} came_from                          : Pervious move (avoid returnig to last state)
+         * @param  {int} lastDirection                      : Pervious move (avoid returnig to last state)
          * @param  {std::shared_ptr<Node>} parent           : Parent of current node
          */
         Node(
             const std::array<std::array<int, 3>, 3>& mat,
             int level,
-            int came_from,
+            int lastDirection,
             const std::shared_ptr<Node>& parent);
         /**
          * Checks if two states are the same
@@ -33,7 +35,7 @@ private:
         bool operator==(const Node& second_node) const;
         std::shared_ptr<Node> parent_of_node;
         std::array<std::array<int, 3>, 3> mat;
-        int zero_x, zero_y, level, came_from;
+        int zero_x, zero_y, level, lastDirection;
     };
     // Avoid verbose writing
     using Node_ptr = std::shared_ptr<Node>;
@@ -100,9 +102,9 @@ public:
         const std::array<std::array<int, 3>, 3>& goal_puzzle);
     /**
      * Solves the puzzle
-     * @param  {std::array<int, 4>} settings : Users prefrences 
+     * @param  {std::array<int, 5>} settings : Users prefrences 
      */
-    void Solve_Puzzle(const std::array<int, 4>& settings);
+    void Solve_Puzzle(const std::array<int, 5>& settings);
 };
 
 #endif

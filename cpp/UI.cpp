@@ -67,12 +67,12 @@ bool is_Solvable(
  * Sets init and goal puzzle and UI Colors based on users preferences
  * @param  {std::array<std::array<int, 3>, 3>&} initial  : Initial state of Puzzle
  * @param  {std::array<std::array<int, 3>, 3>&} goal     : Goal state of Puzzle
- * @param  {std::array<int, 4>&}                settings : User settings
+ * @param  {std::array<int, 5>&}                settings : User settings
  */
 void UI_Settings(
     std::array<std::array<int, 3>, 3>& initial,
     std::array<std::array<int, 3>, 3>& goal,
-    std::array<int, 4>& settings)
+    std::array<int, 5>& settings)
 {
     char special_puzzle;
     std::string name {};
@@ -127,7 +127,9 @@ void UI_Settings(
     // In case user wants a special state take in puzzle from user
     if (special_puzzle == 'Y' || special_puzzle == 'y') {
         std::cout << "\u001b[" << 29 + settings[0] << ";1m"
-                  << "Nice, Enter your puzzle bellow: (Left to Right -> Top to Bottom)" << std::endl
+                  << std::endl
+                  << "Nice, Enter your puzzle bellow: (Left to Right -> Top to Bottom)"
+                  << " \u001b[31;1m(Empty tile -> 0) (Press Enter after each insertion)" << std::endl
                   << std::endl;
         for (size_t i = 0; i < 3; i++) {
             for (size_t j = 0; j < 3; j++) {
@@ -183,7 +185,9 @@ void UI_Settings(
     // In case user wants a special state take in puzzle from user
     if (special_puzzle == 'Y' || special_puzzle == 'y') {
         std::cout << "\u001b[" << 29 + settings[0] << ";1m"
-                  << "Nice, Enter your puzzle bellow: (Left to Right -> Top to Bottom)" << std::endl
+                  << std::endl
+                  << "Nice, Enter your puzzle bellow: (Left to Right -> Top to Bottom)"
+                  << " \u001b[31;1m(Empty tile -> 0) (Press Enter after each insertion)" << std::endl
                   << std::endl;
         for (size_t i = 0; i < 3; i++) {
             for (size_t j = 0; j < 3; j++) {
@@ -240,10 +244,31 @@ void UI_Settings(
         std::getline(std::cin, name);
     }
 
+    // Asking for Algorithm
+    std::cout << "\u001b[" << 29 + settings[0] << ";1m" << std::endl;
+    std::cout << "\u001b[H\u001b[3J\u001b[2J";
+    std::cout << "Choose one of these algorithms: \u001b[s" << std::endl
+              << std::endl;
+    std::cout << "\u001b[32;1m 0 - A*  + Bi-Directional (Recomended)" << std::endl
+              << "\u001b[35;1m 1 - BFS + Bi-Directional" << std::endl
+              << "\u001b[33;1m 2 - DFS + Bi-Directional (Not Recomended at all)\u001b[u"
+              << "\u001b[" << 29 + settings[0] << ";1m";
+    // keep recieving input till it's valid
+    do {
+        std::cout << "\u001b[u\u001b[0K";
+        std::cin >> settings[4];
+    } while (settings[4] < 0 || settings[4] > 2);
+
     // Asking for Max search depth
     std::cout << "\u001b[" << 29 + settings[0] << ";1m" << std::endl;
     std::cout << "\u001b[H\u001b[3J\u001b[2J";
-    std::cout << "Almost there ----> Please enter Max search depth: \u001b[s";
+    std::cout << "Almost there ----> Please enter Max search depth "
+              << "(Because of Bidirectional search steps may be up to 2 * Max depth ): \u001b[s"
+              << std::endl
+              << std::endl;
+
+    std::cout << "\u001b[31;1mBetter be above 20 because most of puzzles are solved in 20 moves or above"
+              << "\u001b[" << 29 + settings[0] << ";1m";
     // keep recieving input till it's valid
     do {
         std::cout << "\u001b[u\u001b[0K";
