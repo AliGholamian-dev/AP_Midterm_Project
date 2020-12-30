@@ -251,30 +251,31 @@ void UI_Settings(
               << std::endl;
     std::cout << "\u001b[32;1m 0 - A*  + Bi-Directional (Recomended)" << std::endl
               << "\u001b[35;1m 1 - BFS + Bi-Directional" << std::endl
-              << "\u001b[33;1m 2 - DFS + Bi-Directional (Not Recomended at all)\u001b[u"
+              << "\u001b[33;1m 2 - DLS + Bi-Directional (Not Recomended at all)\u001b[u"
               << "\u001b[" << 29 + settings[0] << ";1m";
     // keep recieving input till it's valid
     do {
         std::cout << "\u001b[u\u001b[0K";
         std::cin >> settings[4];
     } while (settings[4] < 0 || settings[4] > 2);
+    if (settings[4] == 2) // If DLS is selected ask for max depth
+    {
+        // Asking for Max search depth
+        std::cout << "\u001b[" << 29 + settings[0] << ";1m" << std::endl;
+        std::cout << "\u001b[H\u001b[3J\u001b[2J";
+        std::cout << "Almost there ----> Please enter Max search depth "
+                  << "(Because of Bidirectional search steps may be up to 2 * Max depth + 1 ): \u001b[s"
+                  << std::endl
+                  << std::endl;
 
-    // Asking for Max search depth
-    std::cout << "\u001b[" << 29 + settings[0] << ";1m" << std::endl;
-    std::cout << "\u001b[H\u001b[3J\u001b[2J";
-    std::cout << "Almost there ----> Please enter Max search depth "
-              << "(Because of Bidirectional search steps may be up to 2 * Max depth ): \u001b[s"
-              << std::endl
-              << std::endl;
-
-    std::cout << "\u001b[31;1mBetter be above 20 because most of puzzles are solved in 20 moves or above"
-              << "\u001b[" << 29 + settings[0] << ";1m";
-    // keep recieving input till it's valid
-    do {
-        std::cout << "\u001b[u\u001b[0K";
-        std::cin >> settings[2];
-    } while (settings[2] < 0);
-
+        std::cout << "\u001b[31;1mBetter be above 20 because most of puzzles are solved in 20 moves or above"
+                  << "\u001b[" << 29 + settings[0] << ";1m";
+        // keep recieving input till it's valid
+        do {
+            std::cout << "\u001b[u\u001b[0K";
+            std::cin >> settings[2];
+        } while (settings[2] < 0);
+    }
     // Asking for Delay time between showing each state of answer
     std::cout << "\u001b[H\u001b[3J\u001b[2J";
     std::cout << "One last thing ----> Please enter time intervals for showing each step in ms : \u001b[s";

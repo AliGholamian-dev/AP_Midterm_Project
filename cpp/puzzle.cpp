@@ -225,7 +225,8 @@ void Puzzle::Solve_Puzzle(const std::array<int, 5>& settings)
             if (
                 this->Check_Coordinates(prior_node->zero_x + this->row[i], prior_node->zero_y + this->col[i])
                 && prior_node->lastDirection != 3 - i
-                && prior_node->level < _max_depth) {
+                && (prior_node->level < _max_depth || settings[4] != 2)) // Check depth in DLS
+            {
                 std::array<std::array<int, 3>, 3> temp { prior_node->mat };
                 // Swap empty square with it's neighbor
                 std::swap(
@@ -241,7 +242,8 @@ void Puzzle::Solve_Puzzle(const std::array<int, 5>& settings)
             if (
                 this->Check_Coordinates(r_prior_node->zero_x + this->row[i], r_prior_node->zero_y + this->col[i])
                 && r_prior_node->lastDirection != 3 - i
-                && r_prior_node->level < _max_depth) {
+                && (r_prior_node->level < _max_depth || settings[4] != 2)) // Check depth in DLS
+            {
                 std::array<std::array<int, 3>, 3> temp { r_prior_node->mat };
                 // Swap empty square with it's neighbor
                 std::swap(
