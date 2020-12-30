@@ -46,6 +46,7 @@ private:
     // Indicators of four moves for empty square
     std::array<int, 4> row { 1, 0, 0, -1 };
     std::array<int, 4> col { 0, -1, 1, 0 };
+    // Algorithm enumrator
     enum Algo {
         A_Star,
         BFS,

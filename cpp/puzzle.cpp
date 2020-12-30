@@ -116,7 +116,7 @@ void Puzzle::Solve_Puzzle(const std::array<int, 5>& settings)
         cl_forw = cl_rev = 2;
     else if (settings[4] == Algo::DLS) // User wants to run with DLS
         cl_forw = cl_rev = 3;
-    else { // A*
+    else { // A* -> default
         cl_forw = 0;
         cl_rev = 1;
     }
