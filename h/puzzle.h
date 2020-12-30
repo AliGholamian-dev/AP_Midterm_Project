@@ -46,9 +46,14 @@ private:
     // Indicators of four moves for empty square
     std::array<int, 4> row { 1, 0, 0, -1 };
     std::array<int, 4> col { 0, -1, 1, 0 };
-
+    enum Algo {
+        A_Star,
+        BFS,
+        DLS
+    };
     // Solvable function from "UI.h"
-    friend bool is_Solvable(
+    friend bool
+    is_Solvable(
         const std::array<std::array<int, 3>, 3>& initial,
         const std::array<std::array<int, 3>, 3>& goal);
 

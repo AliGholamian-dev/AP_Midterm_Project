@@ -111,15 +111,20 @@ void Puzzle::Solve_Puzzle(const std::array<int, 5>& settings)
     }
     // Warn user that program is solving puzzle
     std::cout << "Solving..." << std::endl;
+    // Check which algorithm to use -> Default is A*
+    if (settings[4] == Algo::BFS) // User wants to run with BFS
+        cl_forw = cl_rev = 2;
+    else if (settings[4] == Algo::DLS) // User wants to run with DLS
+        cl_forw = cl_rev = 3;
+    else { // A*
+        cl_forw = 0;
+        cl_rev = 1;
+    }
     // Lambda function for comaparing two node's cost (Used in priority_queue)
     // Sorts nodes based on cost for ( A* ) algorithm and BFS
     // Cost = puzzle's disorder + level(depth) -> A* + Bidirectinal
     // Cost = level(depth) -> BFS + Bidirectinal
-
-    if (settings[4] == 1) // User wants to run with BFS
-        cl_forw = cl_rev = 2;
-    else if (settings[4] == 2) // User wants to run with DLS
-        cl_forw = cl_rev = 3;
+    // lambda always returm true -> DLS + Bidirectinal
     auto comp {
         [&](const Node_ptr& n1, const Node_ptr& n2) {
             return (cl_forw == 3 ? true : this->Calculate_Cost(n1, cl_forw) > this->Calculate_Cost(n2, cl_forw));
@@ -225,7 +230,7 @@ void Puzzle::Solve_Puzzle(const std::array<int, 5>& settings)
             if (
                 this->Check_Coordinates(prior_node->zero_x + this->row[i], prior_node->zero_y + this->col[i])
                 && prior_node->lastDirection != 3 - i
-                && (prior_node->level < _max_depth || settings[4] != 2)) // Check depth in DLS
+                && (prior_node->level < _max_depth || settings[4] != Algo::DLS)) // Check depth in DLS
             {
                 std::array<std::array<int, 3>, 3> temp { prior_node->mat };
                 // Swap empty square with it's neighbor
@@ -242,7 +247,7 @@ void Puzzle::Solve_Puzzle(const std::array<int, 5>& settings)
             if (
                 this->Check_Coordinates(r_prior_node->zero_x + this->row[i], r_prior_node->zero_y + this->col[i])
                 && r_prior_node->lastDirection != 3 - i
-                && (r_prior_node->level < _max_depth || settings[4] != 2)) // Check depth in DLS
+                && (r_prior_node->level < _max_depth || settings[4] != Algo::DLS)) // Check depth in DLS
             {
                 std::array<std::array<int, 3>, 3> temp { r_prior_node->mat };
                 // Swap empty square with it's neighbor
